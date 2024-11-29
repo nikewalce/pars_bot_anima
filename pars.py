@@ -25,21 +25,15 @@ class pars:
         response.raise_for_status()
         #получаем разметку страницы
         soup = BeautifulSoup(response.text, 'lxml')
-        #находим тег td с классом
-        result = soup.find_all('td', class_='stat-results__count _order_3')
+        #находим тег tr с классом
         all = soup.find_all('tr', class_='stat-results__row js-tournament-filter-row')
-
-        # узнаем сегодняшнюю дату
-        current_datetime = datetime.now().date()
-        # меняем формат даты с гггг-мм-дд на дд.мм.ггг.
-        date_lst = str(current_datetime).split('-')
-        date = f'{date_lst[2]}.{date_lst[1]}.{date_lst[0]}'
 
         # Список для хранения извлеченных данных
         matches = []
 
         for row in all:
             # Извлечение названия команд
+
             teams_tag = row.find('div', class_='stat-results__title-teams _margin-fav')
             if not teams_tag:
                 continue
@@ -61,17 +55,29 @@ class pars:
 
             # Добавляем данные в список
             matches.append([teams, datetime_text.split()[0], tournament_title, datetime_text.split()[1], score])
-        today_matches = []
+
+        return matches
+
+
+    def today_matches(self, matches):
+        today_matches_lst = []
+
+        # узнаем сегодняшнюю дату
+        current_datetime = datetime.now().date()
+        # меняем формат даты с гггг-мм-дд на дд.мм.ггг.
+        date_lst = str(current_datetime).split('-')
+        date = f'{date_lst[2]}.{date_lst[1]}.{date_lst[0]}'
+
         # выводим сегодняшние матчи
         for i in matches:
             if i[1] == date:
-                today_matches.append(i)
-        return today_matches
-
+                today_matches_lst.append(i)
+        return today_matches_lst
 
 start = pars()
-today_matches = start.main()
-for i in today_matches:
+matches = start.main()
+today = start.today_matches(matches)
+for i in today:
     print(i)
 
 

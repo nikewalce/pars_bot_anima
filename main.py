@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import sys
-
+from pars import *
 from aiogram import Bot, Dispatcher, html, F, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -18,31 +18,38 @@ dp = Dispatcher()
 async def command_start_handler(message: Message) -> None:
     await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
 
-#Этот обработчик получает сообщения с помощью команды `/test`, вызывет обычное меню с 2 кнопками.
-@dp.message(F.text, Command("test"))
+#Этот обработчик получает сообщения с помощью команды `/games`, вызывет обычное меню с 2 кнопками.
+@dp.message(F.text, Command("games"))
 async def any_message(message: Message):
     kb = [
         [
-            types.KeyboardButton(text="С пюрешкой"),
-            types.KeyboardButton(text="Без пюрешки")
+            types.KeyboardButton(text="Лига Европы. Сегодня"),
+            types.KeyboardButton(text="Лига Европы. Все матчи")
         ],
     ]
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=kb,
         resize_keyboard=True,
-        input_field_placeholder="Выберите способ подачи"
+        input_field_placeholder="Выберите вариант"
     )
-    await message.answer("Как подавать котлеты?", reply_markup=keyboard)
+    await message.answer("Выберите вариант!", reply_markup=keyboard)
 
 #Ловим нажатие кнопки(текст, который она отправляет)
-@dp.message(F.text.lower() == "с пюрешкой")
+@dp.message(F.text.lower() == "лига европы. сегодня")
 async def with_puree(message: types.Message):
-    await message.reply("Отличный выбор!")
+    start = pars()
+    matches = start.main()
+    today = start.today_matches(matches)
 
-@dp.message(F.text.lower() == "без пюрешки")
+    await message.reply(f"{today}")
+
+@dp.message(F.text.lower() == "лига европы. все матчи")
 async def without_puree(message: types.Message):
+    start = pars()
+    matches = start.main()
+    #выводим 10 первых игр
     # reply_markup=types.ReplyKeyboardRemove() - удаляет клавиатуру
-    await message.reply("Так невкусно!", reply_markup=types.ReplyKeyboardRemove())
+    await message.reply(f"{matches[0:10]}", reply_markup=types.ReplyKeyboardRemove())
 
 
 
