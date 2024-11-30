@@ -74,10 +74,14 @@ class pars:
                 today_matches_lst.append(i)
         return today_matches_lst
 
-start = pars()
-matches = start.main()
-today = start.today_matches(matches)
-for i in today:
-    print(i)
+# start = pars()
+# matches = start.main()
+
+# for i in matches:
+#     print(f"{i[0]}\n{i[1]}\n{i[3]}\n{i[4]}")
+#
+# today = start.today_matches(matches)
+# for i in today:
+#     print(i)
 
 
